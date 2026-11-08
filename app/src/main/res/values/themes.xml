@@ -6,4 +6,6 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+    <!-- Follows the system light/dark theme (DayNight) for the home-screen widget. -->
+    <style name="Theme.Callme.Widget" parent="android:Theme.DeviceDefault.DayNight" />
 </resources>

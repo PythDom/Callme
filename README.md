@@ -38,6 +38,14 @@ See [SPEC.md](SPEC.md) for the full behaviour.
   switches to loudspeaker). Holding the phone to your ear turns the screen off.
 - Nothing is written to the real call log; no internet permission.
 
+## One-tap shortcuts
+- **Widget:** long-press the home screen → Widgets → Callme → "Call me". Pick a
+  favorite and a delay; each tap then schedules "X calls me in N min". Add several
+  widgets for different people/delays; long-press a widget to change it.
+- **Quick-settings tile:** in Callme tap **Quick call tile**, pick a favorite and a
+  delay, and accept the prompt to add the tile (or add "Call me" yourself by editing
+  the quick-settings panel). Long-press the tile to change its preset.
+
 ## Build locally
 
 Requirements: JDK 17+, Android SDK (platform 35).

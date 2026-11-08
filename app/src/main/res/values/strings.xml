@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Callme</string>
+    <string name="widget_description">Call me in a few minutes, by a favorite contact</string>
+    <string name="widget_setup">Tap to set up</string>
+    <string name="tile_label">Call me</string>
 </resources>

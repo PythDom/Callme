@@ -1,5 +1,6 @@
 package com.pythdom.callme.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
 import androidx.activity.ComponentActivity
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.AlertDialog
@@ -58,6 +60,7 @@ import com.pythdom.callme.data.ContactsRepository
 import com.pythdom.callme.data.FavoriteContact
 import com.pythdom.callme.data.PhoneNumber
 import com.pythdom.callme.data.ScheduledCall
+import com.pythdom.callme.quick.QuickCallConfigActivity
 import com.pythdom.callme.scheduling.CallScheduler
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -150,7 +153,23 @@ private fun HomeScreen(onSchedule: () -> Unit, onEdit: (ScheduledCall) -> Unit) 
     val canSchedule = regular < Config.MAX_PENDING_CALLS && reqs.filter { it.blocking }.all { it.ok }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Callme") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Callme") },
+                actions = {
+                    TextButton(onClick = {
+                        context.startActivity(
+                            Intent(context, QuickCallConfigActivity::class.java)
+                                .putExtra(QuickCallConfigActivity.EXTRA_TILE, true),
+                        )
+                    }) {
+                        Icon(Icons.Filled.Bolt, null)
+                        Spacer(Modifier.width(4.dp))
+                        Text("Quick call tile")
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { if (canSchedule) onSchedule() },
@@ -196,7 +215,9 @@ private fun HomeScreen(onSchedule: () -> Unit, onEdit: (ScheduledCall) -> Unit) 
             if (calls.isEmpty()) {
                 item {
                     Text(
-                        "No calls scheduled. Tap \"Schedule a call\" to pick a favorite and a time.",
+                        "No calls scheduled. Tap \"Schedule a call\" to pick a favorite and a time.\n\n" +
+                            "For one-tap calls, add the \"Call me\" widget from your home screen " +
+                            "(long-press → Widgets → Callme) or set up the quick-settings tile.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(vertical = 24.dp),

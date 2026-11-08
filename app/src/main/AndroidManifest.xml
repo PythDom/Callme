@@ -47,6 +47,46 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Callme.Call" />
 
+        <activity
+            android:name=".quick.QuickCallConfigActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="Quick call"
+            android:taskAffinity="com.pythdom.callme.quick">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".quick.QuickCallWidget"
+            android:exported="false"
+            android:label="Call me">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quick_call_widget" />
+        </receiver>
+
+        <service
+            android:name=".quick.QuickCallTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_call_notification"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="false" />
+        </service>
+
         <service
             android:name=".call.CallService"
             android:exported="false"

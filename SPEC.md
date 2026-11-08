@@ -128,4 +128,7 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 5. **Declined or missed call → one callback.** Ring duration is **20 s**. If the call is unanswered, post a Samsung-style **"Missed call" notification**. Whether the call was **declined or missed**, the same contact **calls back once, 90 seconds later** (counted from the decline, or from the end of ringing). The callback can be answered, declined or missed like any call, but it never triggers another callback; a missed callback posts a second missed-call notification. Nothing is written to the real call log. The pending callback doesn't count toward the 3-pending limit and is shown in the home list so it can be cancelled.
 6. **Target device: Samsung, Android 14+** → `minSdk 34`, `targetSdk 35`. Onboarding includes Samsung-specific steps (exclude from "Sleeping apps" / set battery to "Unrestricted").
 7. **Language: English only.**
-8. **No quick trigger** (no widget / quick-settings tile).
+8. **Quick trigger (added after v1):** one-tap "call me in N min, by X" shortcuts.
+   - **Home-screen widget** ("Call me", 2×1): configured when placed (favorite + delay of 1, 2, 5, 10, 15 or 30 min); several widgets can hold different presets; reconfigurable by long-press.
+   - **Quick-settings tile** ("Call me", subtitle "Sophie · 5 min"): one preset, set from the app ("Quick call tile"), by tapping the tile before it's set up, or by long-pressing it. The app offers to add the tile to quick settings.
+   - A tap schedules a normal call (counts toward the 3-call limit, gets the usual callback) and shows a discreet "Call scheduled in N min" toast; if 3 calls are already waiting, it says so instead.
