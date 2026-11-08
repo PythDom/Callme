@@ -6,6 +6,8 @@ the contact's photo, your ringtone, and a "someone talking" voice once answered.
 
 See [SPEC.md](SPEC.md) for the full behaviour.
 
+![Incoming call, initials fallback, in-call, call ended](docs/screens.png)
+
 ## Install on the phone
 
 1. Open the repository's **Actions** tab → latest **Build APK** run → download the
@@ -45,6 +47,14 @@ Requirements: JDK 17+, Android SDK (platform 35).
 ```
 
 The APK is in `app/build/outputs/apk/release/`.
+
+Call-screen snapshot tests (rendered on the JVM with Paparazzi, no device needed):
+
+```bash
+./gradlew verifyPaparazziDebug
+```
+
+After an intentional UI change, re-record them with `./gradlew recordPaparazziDebug`.
 
 ### Stable signing key (recommended)
 

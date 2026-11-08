@@ -80,6 +80,18 @@ class CallService : Service() {
         if (this.call != null) {
             // Another fake call is already ringing or in progress: postpone this one.
             CallScheduler.schedule(this, call.copy(triggerAt = System.currentTimeMillis() + 60_000))
+            // Every startForegroundService() must be answered by startForeground(), or Android
+            // kills the app. Re-post the current call's notification.
+            val current = caller ?: ContactsRepository.resolveCaller(this, call)
+            val notification = when (val state = CallManager.state.value) {
+                is CallState.Active -> CallNotifications.ongoing(this, current, System.currentTimeMillis() -
+                    (SystemClock.elapsedRealtime() - state.connectedAt))
+                else -> CallNotifications.incoming(this, current)
+            }
+            startForeground(CallNotifications.CALL_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL)
+            if (CallManager.state.value !is CallState.Ringing && CallManager.state.value !is CallState.Active) {
+                stopForeground(STOP_FOREGROUND_REMOVE) // the current call is already ending
+            }
             return START_NOT_STICKY
         }
         val caller = ContactsRepository.resolveCaller(this, call)
