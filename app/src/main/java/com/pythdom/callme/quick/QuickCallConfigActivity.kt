@@ -67,19 +67,30 @@ class QuickCallConfigActivity : ComponentActivity() {
 
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID
     private val isWidget get() = widgetId != AppWidgetManager.INVALID_APPWIDGET_ID
+    private var slot = -1
+    private val isSlot get() = slot >= 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+        slot = intent.getIntExtra(EXTRA_SLOT, -1)
         // If the user backs out, the launcher must not place an unconfigured widget.
         if (isWidget) setResult(RESULT_CANCELED, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
 
-        val existing = if (isWidget) QuickCallStore.widget(this, widgetId) else QuickCallStore.tile(this)
+        val existing = when {
+            isWidget -> QuickCallStore.widget(this, widgetId)
+            isSlot -> QuickCallStore.slot(this, slot)
+            else -> QuickCallStore.tile(this)
+        }
         enableEdgeToEdge()
         setContent {
             CallmeTheme {
                 QuickCallConfig(
-                    title = if (isWidget) "Widget: call me in…" else "Quick-settings tile",
+                    title = when {
+                        isWidget -> "Widget: call me in…"
+                        isSlot -> "Quick call ${slot + 1}"
+                        else -> "Quick-settings tile"
+                    },
                     existing = existing,
                     onCancel = { finish() },
                     onSave = ::save,
@@ -89,7 +100,10 @@ class QuickCallConfigActivity : ComponentActivity() {
     }
 
     private fun save(preset: QuickCallPreset) {
-        if (isWidget) {
+        if (isSlot) {
+            QuickCallStore.setSlot(this, slot, preset)
+            finish()
+        } else if (isWidget) {
             QuickCallStore.setWidget(this, widgetId, preset)
             QuickCallWidget.update(this, AppWidgetManager.getInstance(this), widgetId)
             setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
@@ -111,6 +125,8 @@ class QuickCallConfigActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_TILE = "tile"
+        /** Index of the in-app quick preset slot to edit (0 until QuickCallStore.SLOT_COUNT). */
+        const val EXTRA_SLOT = "slot"
     }
 }
 

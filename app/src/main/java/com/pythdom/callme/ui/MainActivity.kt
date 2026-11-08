@@ -61,6 +61,7 @@ import com.pythdom.callme.data.FavoriteContact
 import com.pythdom.callme.data.PhoneNumber
 import com.pythdom.callme.data.ScheduledCall
 import com.pythdom.callme.quick.QuickCallConfigActivity
+import com.pythdom.callme.quick.QuickCallStore
 import com.pythdom.callme.scheduling.CallScheduler
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -137,6 +138,7 @@ private fun HomeScreen(onSchedule: () -> Unit, onEdit: (ScheduledCall) -> Unit) 
     var refresh by remember { mutableIntStateOf(0) }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refresh++ }
     val reqs = remember(refresh) { requirements(context) }
+    val presets = remember(refresh) { QuickCallStore.slots(context) }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { refresh++ }
@@ -197,6 +199,9 @@ private fun HomeScreen(onSchedule: () -> Unit, onEdit: (ScheduledCall) -> Unit) 
                         }
                     }
                 }
+            }
+            item {
+                QuickPresetsRow(presets, enabled = reqs.filter { it.blocking }.all { it.ok }) { refresh++ }
             }
             item {
                 Text(

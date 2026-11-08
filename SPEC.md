@@ -131,4 +131,5 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 8. **Quick trigger (added after v1):** one-tap "call me in N min, by X" shortcuts.
    - **Home-screen widget** ("Call me", 2×1): configured when placed (favorite + delay of 1, 2, 5, 10, 15 or 30 min); several widgets can hold different presets; reconfigurable by long-press.
    - **Quick-settings tile** ("Call me", subtitle "Sophie · 5 min"): one preset, set from the app ("Quick call tile"), by tapping the tile before it's set up, or by long-pressing it. The app offers to add the tile to quick settings.
+   - **In-app quick presets:** a "Quick calls" row of 4 slots on the home screen. Empty slot → tap to define (favorite + delay); set slot → tap schedules the call; long-press → Change / Remove.
    - A tap schedules a normal call (counts toward the 3-call limit, gets the usual callback) and shows a discreet "Call scheduled in N min" toast; if 3 calls are already waiting, it says so instead.

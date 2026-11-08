@@ -39,6 +39,9 @@ See [SPEC.md](SPEC.md) for the full behaviour.
 - Nothing is written to the real call log; no internet permission.
 
 ## One-tap shortcuts
+- **In the app:** the "Quick calls" row holds 4 presets. Tap an empty slot to
+  choose a favorite and a delay; tap a set slot to get that call; long-press it
+  to change or remove it.
 - **Widget:** long-press the home screen → Widgets → Callme → "Call me". Pick a
   favorite and a delay; each tap then schedules "X calls me in N min". Add several
   widgets for different people/delays; long-press a widget to change it.

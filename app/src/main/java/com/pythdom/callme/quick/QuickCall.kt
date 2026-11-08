@@ -63,6 +63,13 @@ object QuickCallStore {
     fun widget(context: Context, widgetId: Int) = read(context, "widget_$widgetId")
     fun setWidget(context: Context, widgetId: Int, preset: QuickCallPreset?) = write(context, "widget_$widgetId", preset)
 
+    /** Number of in-app quick preset slots on the home screen. */
+    const val SLOT_COUNT = 4
+
+    fun slot(context: Context, index: Int) = read(context, "slot_$index")
+    fun setSlot(context: Context, index: Int, preset: QuickCallPreset?) = write(context, "slot_$index", preset)
+    fun slots(context: Context) = (0 until SLOT_COUNT).map { slot(context, it) }
+
     fun tile(context: Context) = read(context, TILE)
     fun setTile(context: Context, preset: QuickCallPreset?) = write(context, TILE, preset)
 }
