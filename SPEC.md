@@ -1,6 +1,6 @@
-# Callme — Functional & Technical Specification (v0.2)
+# Callme — Functional & Technical Specification (v0.3)
 
-> Status: **decisions agreed** (see §8). Nothing is coded yet. **[DECISION n]** markers refer to §8.
+> Status: **decisions agreed** (see §8), v1 implemented. **[DECISION n]** markers refer to §8.
 
 ## 1. Purpose
 
@@ -37,7 +37,7 @@ No real call is placed, no network or SIM is used, no data leaves the phone.
 2. "Schedule a call" → **Favorites picker**: list of starred contacts (photo/initials, name, number(s)).
    - If the contact has several numbers, user picks one (it's displayed on the call screen).
 3. **Time picker**: date + time. Shortcuts: "in 1 min", "in 5 min", "in 15 min", "in 30 min".
-4. Optional settings for this call: ringtone (default = system ringtone), vibration on/off, ring duration before "missed" (default 20 s).
+4. No per-call options: the call uses the phone's own ringtone and vibration settings (most realistic); ring duration is fixed at 20 s.
 5. Save → call appears in the home list with a countdown; user can edit or delete it.
 
 ### 3.2 The fake call
@@ -69,7 +69,7 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 ### 5.1 Stack
 - Kotlin, Jetpack Compose (Material 3), single-module Gradle project.
 - `minSdk` 34 (Android 14), `targetSdk` 35 (Android 15) **[DECISION 6]**.
-- Persistence: Room (table `scheduled_call`: id, contactLookupKey, displayName, number, numberLabel, photoUri, triggerAtMillis, ringtoneUri, vibrate, status).
+- Persistence: a small JSON list in SharedPreferences (at most a few entries; no database needed). Fields: id, contactId, lookupKey, name, number, numberLabel, photoThumbUri, triggerAt, isCallback.
 - No internet permission.
 
 ### 5.2 Contacts
@@ -79,9 +79,11 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 - No photo → initials on a coloured background (as stock dialers do).
 
 ### 5.3 Scheduling
-- `AlarmManager.setAlarmClock()` (most reliable; survives Doze; exact). Requires `SCHEDULE_EXACT_ALARM` (user-granted on Android 14+) — or `USE_EXACT_ALARM` which is acceptable since we're not on the Play Store.
-- `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` / time-zone-change receivers re-register pending alarms.
-- Alarm receiver → starts a foreground service (type `phoneCall`/`shortService` per API level) that plays the ringtone and posts a **full-screen-intent notification** (category `CALL`) launching the incoming-call activity.
+- `AlarmManager.setExactAndAllowWhileIdle()` (exact, fires in Doze). Not `setAlarmClock()`, which shows an alarm icon in the status bar and would give the trick away. Uses the auto-granted `USE_EXACT_ALARM` (acceptable since we're not on the Play Store).
+- `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` / time / time-zone-change receivers re-register pending alarms; a call whose time passed more than 1 min ago while the phone was off is dropped.
+- Alarm receiver → starts a foreground service (type `phoneCall`) that plays the ringtone and posts a **full-screen-intent `CallStyle` notification** launching the incoming-call activity. When the phone is unlocked and in use, Android shows it as a heads-up call pop-up with Answer/Decline, like a real call on Samsung.
+- If a call is due while another fake call is ringing or in progress, it is postponed by 1 min.
+- Known limitation: with Do Not Disturb on, Android may hide the call screen unless Callme is an allowed app in DND settings (vibration still happens).
 - Incoming-call activity: `setShowWhenLocked(true)`, `setTurnScreenOn(true)`, excluded from recents.
 - Note: some OEMs (Xiaomi, Huawei, Samsung "deep sleep") kill background alarms; onboarding will link to battery-optimisation exemption.
 
