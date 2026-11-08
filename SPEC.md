@@ -37,7 +37,7 @@ No real call is placed, no network or SIM is used, no data leaves the phone.
 2. "Schedule a call" → **Favorites picker**: list of starred contacts (photo/initials, name, number(s)).
    - If the contact has several numbers, user picks one (it's displayed on the call screen).
 3. **Time picker**: date + time. Shortcuts: "in 1 min", "in 5 min", "in 15 min", "in 30 min".
-4. Optional settings for this call: ringtone (default = system ringtone), vibration on/off, ring duration before "missed" (default 30 s).
+4. Optional settings for this call: ringtone (default = system ringtone), vibration on/off, ring duration before "missed" (default 20 s).
 5. Save → call appears in the home list with a countdown; user can edit or delete it.
 
 ### 3.2 The fake call
@@ -46,8 +46,8 @@ No real call is placed, no network or SIM is used, no data leaves the phone.
 3. Displayed: contact photo (full-bleed or circle as the stock dialer does), name, number/label ("Mobile"), "Incoming call", answer & decline controls (swipe or buttons matching the stock look).
 4. Outcomes:
    - **Answer** → in-call screen: photo, name, timer 00:00 counting up, mute/speaker/keypad buttons (cosmetic), red hang-up button. A looping "mumbling" voice clip plays in the earpiece **[DECISION 4]**.
-   - **Decline** → screen closes, ringing stops.
-   - **No action** for N seconds → stops ringing, posts a "Missed call from X" notification and calls back once, 2 min later **[DECISION 5]**.
+   - **Decline** → screen closes, ringing stops; the contact calls back once, 90 s later **[DECISION 5]**.
+   - **No action** for 20 s → stops ringing, posts a "Missed call from X" notification; the contact calls back once, 90 s later **[DECISION 5]**.
    - Volume/power button press → silences the ringer (like a real call).
 
 ### 3.3 First launch / permissions
@@ -123,7 +123,7 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 2. **Recurrence: one-shot only.** At most **3 pending calls** at once; the "Schedule" button is disabled (with an explanation) when 3 are pending.
 3. **Ringer mode:** Normal → ringtone (+ vibration if the system "vibrate while ringing" setting is on). Vibrate, Silent or Do Not Disturb → **vibrate only**, never sound.
 4. **After answering:** play a looping **"mumbling" voice clip** (unintelligible speech-like audio, bundled with the app, royalty-free/generated) through the **earpiece** (switchable to speaker with the cosmetic speaker button).
-5. **Missed call:** if unanswered after the ring duration, post a Samsung-style **"Missed call" notification**, then **call back once**, 2 minutes later by default. If that second call is also missed → a second missed-call notification, no more retries. Nothing is written to the real call log. The retry doesn't count toward the 3-pending limit.
+5. **Declined or missed call → one callback.** Ring duration is **20 s**. If the call is unanswered, post a Samsung-style **"Missed call" notification**. Whether the call was **declined or missed**, the same contact **calls back once, 90 seconds later** (counted from the decline, or from the end of ringing). The callback can be answered, declined or missed like any call, but it never triggers another callback; a missed callback posts a second missed-call notification. Nothing is written to the real call log. The pending callback doesn't count toward the 3-pending limit and is shown in the home list so it can be cancelled.
 6. **Target device: Samsung, Android 14+** → `minSdk 34`, `targetSdk 35`. Onboarding includes Samsung-specific steps (exclude from "Sleeping apps" / set battery to "Unrestricted").
 7. **Language: English only.**
 8. **No quick trigger** (no widget / quick-settings tile).
