@@ -1,6 +1,6 @@
-# Callme — Functional & Technical Specification (draft v0.1)
+# Callme — Functional & Technical Specification (v0.2)
 
-> Status: **draft for review**. Nothing is coded yet. Items marked **[DECISION]** need an answer before implementation starts (see §8).
+> Status: **decisions agreed** (see §8). Nothing is coded yet. **[DECISION n]** markers refer to §8.
 
 ## 1. Purpose
 
@@ -33,7 +33,7 @@ No real call is placed, no network or SIM is used, no data leaves the phone.
 ## 3. User flows
 
 ### 3.1 Scheduling a call
-1. User opens Callme → home screen lists upcoming fake calls (empty state + "Schedule a call" button).
+1. User opens Callme → home screen lists upcoming fake calls (max 3; empty state + "Schedule a call" button).
 2. "Schedule a call" → **Favorites picker**: list of starred contacts (photo/initials, name, number(s)).
    - If the contact has several numbers, user picks one (it's displayed on the call screen).
 3. **Time picker**: date + time. Shortcuts: "in 1 min", "in 5 min", "in 15 min", "in 30 min".
@@ -42,12 +42,12 @@ No real call is placed, no network or SIM is used, no data leaves the phone.
 
 ### 3.2 The fake call
 1. At the scheduled time the phone wakes, the screen turns on and the incoming-call screen appears over the lock screen.
-2. It plays the ringtone and vibrates, honouring the phone's ringer mode (silent / vibrate / normal) **[DECISION 3]**.
+2. It plays the ringtone and vibrates, rings only in Normal mode; in Vibrate, Silent or Do Not Disturb it vibrates only **[DECISION 3]**.
 3. Displayed: contact photo (full-bleed or circle as the stock dialer does), name, number/label ("Mobile"), "Incoming call", answer & decline controls (swipe or buttons matching the stock look).
 4. Outcomes:
-   - **Answer** → in-call screen: photo, name, timer 00:00 counting up, mute/speaker/keypad buttons (cosmetic), red hang-up button. Optional audio played in the earpiece **[DECISION 4]**.
+   - **Answer** → in-call screen: photo, name, timer 00:00 counting up, mute/speaker/keypad buttons (cosmetic), red hang-up button. A looping "mumbling" voice clip plays in the earpiece **[DECISION 4]**.
    - **Decline** → screen closes, ringing stops.
-   - **No action** for N seconds → stops ringing, posts a "Missed call from X" notification **[DECISION 5]**.
+   - **No action** for N seconds → stops ringing, posts a "Missed call from X" notification and calls back once, 2 min later **[DECISION 5]**.
    - Volume/power button press → silences the ringer (like a real call).
 
 ### 3.3 First launch / permissions
@@ -62,13 +62,13 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 | Drawbacks | Must design and maintain the look. | User must enable the "Callme" calling account in system settings (hidden on some OEMs); the dialer may show a small "via Callme" label; the call may appear in the system call log; behaviour varies per OEM. |
 | Reliability | High, fully under our control. | Medium; depends on dialer/OEM. |
 
-**Recommendation:** start with **A (replica)** styled after the user's actual phone, and optionally explore B later as an experimental mode.
+**Chosen: A (replica), Samsung One UI look.** B is not planned.
 
 ## 5. Technical design (proposal)
 
 ### 5.1 Stack
 - Kotlin, Jetpack Compose (Material 3), single-module Gradle project.
-- `minSdk` 26 (Android 8.0), `targetSdk` 35 (Android 15) **[DECISION 6]**.
+- `minSdk` 34 (Android 14), `targetSdk` 35 (Android 15) **[DECISION 6]**.
 - Persistence: Room (table `scheduled_call`: id, contactLookupKey, displayName, number, numberLabel, photoUri, triggerAtMillis, ringtoneUri, vibrate, status).
 - No internet permission.
 
@@ -106,7 +106,7 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 - Call fires within ±5 s of scheduled time when the device is idle/locked.
 - Ringing starts < 2 s after the alarm.
 - Works offline; no analytics; no data leaves the device.
-- App UI language: **[DECISION 7]**.
+- App UI language: English **[DECISION 7]**.
 
 ## 7. Acceptance criteria (v1)
 1. A starred contact with a photo, scheduled 1 min ahead, rings with the photo shown, phone locked and screen off, app swiped away.
@@ -117,13 +117,13 @@ Guided onboarding that requests, with explanations, only what's needed (see §5.
 6. Cancelling a scheduled call guarantees it never fires.
 7. APK installs on the target phone via sideload.
 
-## 8. Open decisions
+## 8. Decisions (agreed 2026-11-08)
 
-1. **UI approach**: A (replica screen) or B (native dialer via Telecom)? If A — which phone/dialer look should it mimic (e.g. Pixel/Google Phone, Samsung One UI)?
-2. **Recurrence**: one-shot only, or also recurring (daily / weekdays)? Multiple pending calls at once?
-3. **Silent mode**: should the fake call ring even when the phone is in silent / Do Not Disturb (like an alarm), or behave exactly like a real call (stay silent)?
-4. **After answering**: silent call, or play an audio clip (pre-recorded voice, e.g. "Hey, I need you to come now") through the earpiece?
-5. **Missed call**: show a fake "missed call" notification if unanswered? Should the fake call ever appear in the real call log (generally no)?
-6. **Target device**: which phone model & Android version will it run on? (Determines minSdk and which look to copy.)
-7. **Language**: UI in English, French, or both?
-8. **Quick trigger**: besides scheduling, do you want an instant "call me in X seconds" shortcut (widget / quick-settings tile)?
+1. **UI approach: A — replica screen, Samsung One UI look** (Samsung Phone app incoming-call and in-call screens).
+2. **Recurrence: one-shot only.** At most **3 pending calls** at once; the "Schedule" button is disabled (with an explanation) when 3 are pending.
+3. **Ringer mode:** Normal → ringtone (+ vibration if the system "vibrate while ringing" setting is on). Vibrate, Silent or Do Not Disturb → **vibrate only**, never sound.
+4. **After answering:** play a looping **"mumbling" voice clip** (unintelligible speech-like audio, bundled with the app, royalty-free/generated) through the **earpiece** (switchable to speaker with the cosmetic speaker button).
+5. **Missed call:** if unanswered after the ring duration, post a Samsung-style **"Missed call" notification**, then **call back once**, 2 minutes later by default. If that second call is also missed → a second missed-call notification, no more retries. Nothing is written to the real call log. The retry doesn't count toward the 3-pending limit.
+6. **Target device: Samsung, Android 14+** → `minSdk 34`, `targetSdk 35`. Onboarding includes Samsung-specific steps (exclude from "Sleeping apps" / set battery to "Unrestricted").
+7. **Language: English only.**
+8. **No quick trigger** (no widget / quick-settings tile).
