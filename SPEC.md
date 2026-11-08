@@ -42,7 +42,7 @@ No real call is placed, no network or SIM is used, no data leaves the phone.
 
 ### 3.2 The fake call
 1. At the scheduled time the phone wakes, the screen turns on and the incoming-call screen appears over the lock screen.
-2. It plays the ringtone and vibrates, rings only in Normal mode; in Vibrate, Silent or Do Not Disturb it vibrates only **[DECISION 3]**.
+2. It rings (ringtone + vibration) only in Normal mode; in Vibrate, Silent or Do Not Disturb it vibrates only **[DECISION 3]**.
 3. Displayed: contact photo (full-bleed or circle as the stock dialer does), name, number/label ("Mobile"), "Incoming call", answer & decline controls (swipe or buttons matching the stock look).
 4. Outcomes:
    - **Answer** → in-call screen: photo, name, timer 00:00 counting up, mute/speaker/keypad buttons (cosmetic), red hang-up button. A looping "mumbling" voice clip plays in the earpiece **[DECISION 4]**.
